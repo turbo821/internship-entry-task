@@ -1,6 +1,17 @@
+
+using Microsoft.EntityFrameworkCore;
+using TickiTackToe.Application.Configurations;
+using TickiTackToe.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+string connection = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? builder.Configuration.GetConnectionString("DefaultConnection")!;
+
+builder.Services.AddDbContext<TickDbContext>(options =>
+    options.UseNpgsql(connection)
+);
+
+builder.Services.Configure<GameConfig>(builder.Configuration.GetSection(nameof(GameConfig)));
 
 builder.Services.AddControllers();
 
@@ -8,15 +19,28 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<TickDbContext>();
+
+    if (app.Environment.IsDevelopment())
+    {
+        await db.Database.MigrateAsync();
+    }
+    else
+    {
+        if (!db.Database.CanConnect())
+            throw new Exception("Database not found");
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseAuthorization();
-
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok());
 
 app.Run();
