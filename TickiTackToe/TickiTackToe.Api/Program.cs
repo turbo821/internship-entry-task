@@ -1,7 +1,9 @@
 
 using Microsoft.EntityFrameworkCore;
 using TickiTackToe.Application.Configurations;
+using TickiTackToe.Application.Interfaces;
 using TickiTackToe.Infrastructure.Data;
+using TickiTackToe.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,9 @@ builder.Services.Configure<GameConfig>(builder.Configuration.GetSection(nameof(G
 builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton<ILuckyService, LuckyService>();
+
 
 var app = builder.Build();
 

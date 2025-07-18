@@ -6,8 +6,6 @@ namespace TickiTackToe.Domain.Entities
 {
     public class Game
     {
-        private readonly Func<int, bool> _isLucky;
-
         public Guid Id { get; set; } = Guid.NewGuid();
         public int GameSize { get; set; }
         public int WinCondition { get; set; }
@@ -18,31 +16,30 @@ namespace TickiTackToe.Domain.Entities
         public string Field {  get; set; }
 
         private Game() { }
-        public Game(int gameSize, int winCondition, Func<int, bool> isLucky)
+        public Game(int gameSize, int winCondition)
         {
             if (gameSize < 3)
                 throw new ArgumentException("Game size < 3");
             if (winCondition > gameSize)
                 throw new ArgumentException("Win condition > game size");
 
-            _isLucky = isLucky;
             GameSize = gameSize;
             WinCondition = winCondition;
             Field = InitialField(gameSize);
         }
 
-        public void MakeMove(int row, int column)
+        public void MakeMove(int row, int column, Func<int, bool> isLucky)
         {
             var field = GetField();
 
-            if (Status != GameStatus.InProgress || CurrentPlayer == CellState.Entry)
+            if (Status != GameStatus.InProgress || CurrentPlayer == CellState.Empty)
                 throw new InvalidOperationException("Game is finish");
             if (row >= GameSize || column >= GameSize || row < 0 || column < 0)
                 throw new ArgumentOutOfRangeException("Move is out of range field");
-            if (field[row, column] != CellState.Entry)
+            if (field[row, column] != CellState.Empty)
                 throw new InvalidOperationException("Cell is set");
 
-            var playerToSet = GetPlayerForCurrentMove();
+            var playerToSet = GetPlayerForCurrentMove(isLucky);
 
             field[row, column] = playerToSet;
 
@@ -64,7 +61,7 @@ namespace TickiTackToe.Domain.Entities
             {
                 for (int j = 0; j < GameSize; j++)
                 {
-                    field[i, j] = CellState.Entry;
+                    field[i, j] = CellState.Empty;
                 }
             }
 
@@ -75,14 +72,14 @@ namespace TickiTackToe.Domain.Entities
         {
             Field = JsonSerializer.Serialize(field);
         }
-        private CellState[,]? GetField()
+        public CellState[,]? GetField()
         {
             return JsonSerializer.Deserialize<CellState[,]>(Field);
         }
 
-        private CellState GetPlayerForCurrentMove()
+        private CellState GetPlayerForCurrentMove(Func<int, bool> isLucky)
         {
-            if (MoveNumber % 3 == 0 && _isLucky(10))
+            if (MoveNumber % 3 == 0 && isLucky(10))
             {
                 return (CurrentPlayer == CellState.X) ? CellState.O : CellState.X;
             }
@@ -107,7 +104,7 @@ namespace TickiTackToe.Domain.Entities
             else if (MoveNumber == GameSize * GameSize)
             {
                 Status = GameStatus.Draw;
-                CurrentPlayer = CellState.Entry;
+                CurrentPlayer = CellState.Empty;
             }
         }
 

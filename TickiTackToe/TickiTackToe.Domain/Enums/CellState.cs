@@ -3,7 +3,7 @@ namespace TickiTackToe.Domain.Enums
 {
     public enum CellState
     {
-        Entry = 0,
+        Empty = 0,
         X = 1,
         O = 2
     }
