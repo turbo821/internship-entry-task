@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using TickiTackToe.Domain.Entities;
 using TickiTackToe.Infrastructure.Data;
 
-namespace TickiTackToe.Tests
+namespace TickiTackToe.Tests.UnitTests
 {
     public class GameRepositoryTests
     {

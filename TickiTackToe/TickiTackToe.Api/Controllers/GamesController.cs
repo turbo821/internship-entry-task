@@ -43,11 +43,11 @@ namespace TickiTackToe.Api.Controllers
             }
             catch (NullReferenceException ex)
             {
-                return NotFound(ex);
+                return NotFound(ex.Message);
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
             catch (ArgumentException ex)
             {

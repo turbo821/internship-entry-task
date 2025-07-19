@@ -1,7 +1,7 @@
 ﻿using TickiTackToe.Domain.Entities;
 using TickiTackToe.Domain.Enums;
 
-namespace TickiTackToe.Tests
+namespace TickiTackToe.Tests.UnitTests
 {
     public class GameTests
     {

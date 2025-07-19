@@ -28,7 +28,7 @@ namespace TickiTackToe.Application.Commands
             if (game.CurrentPlayer != cell)
                 throw new ArgumentException($"{request.Player} not current player");
 
-            game.MakeMove(request.Row-1, request.Column-1, _luckyService.IsLucky);
+            game.MakeMove(request.Row, request.Column, _luckyService.IsLucky);
 
             await _repo.Update(game);
 

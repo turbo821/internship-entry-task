@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TickiTackToe.Tests
+namespace TickiTackToe.Tests.UnitTests
 {
     using System;
     using System.Threading;

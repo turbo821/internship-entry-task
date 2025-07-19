@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using TickiTackToe.Api.Filters;
 using TickiTackToe.Api.Middlewares;
 using TickiTackToe.Application.Commands;
@@ -39,9 +40,19 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<TickDbContext>();
-    await db.Database.MigrateAsync();
-    if (!db.Database.CanConnect())
-        throw new Exception("Database not found");
+
+    var databaseCreator = db.Database.GetService<IDatabaseCreator>();
+    if (databaseCreator is RelationalDatabaseCreator)
+    {
+        await db.Database.MigrateAsync();
+
+        if (!db.Database.CanConnect())
+            throw new Exception("Database not found");
+    }
+    else
+    {
+        await db.Database.EnsureCreatedAsync();
+    }
 }
 
 
@@ -58,3 +69,5 @@ app.MapControllers();
 app.MapGet("/health", () => Results.Ok());
 
 app.Run();
+
+public partial class Program { }

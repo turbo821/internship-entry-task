@@ -4,7 +4,7 @@ using TickiTackToe.Application.Interfaces;
 using TickiTackToe.Domain.Entities;
 using TickiTackToe.Domain.Enums;
 
-namespace TickiTackToe.Tests
+namespace TickiTackToe.Tests.UnitTests
 {
     public class MakeMoveCommandHandlerTests
     {
@@ -17,7 +17,7 @@ namespace TickiTackToe.Tests
             repoMock.Setup(r => r.GetById(It.IsAny<Guid>())).ReturnsAsync((Game?)null);
 
             var handler = new MakeMoveCommandHandler(repoMock.Object, luckyMock.Object);
-            var command = new MakeMoveCommand(Guid.NewGuid(), "X", 1, 1);
+            var command = new MakeMoveCommand(Guid.NewGuid(), "X", 0, 0);
 
             // Act & Assert
             await Assert.ThrowsAsync<NullReferenceException>(() =>
@@ -37,7 +37,7 @@ namespace TickiTackToe.Tests
             repoMock.Setup(r => r.GetById(It.IsAny<Guid>())).ReturnsAsync(game);
 
             var handler = new MakeMoveCommandHandler(repoMock.Object, luckyMock.Object);
-            var command = new MakeMoveCommand(game.Id, "X", 1, 2); // X
+            var command = new MakeMoveCommand(game.Id, "X", 0, 1); // X
 
             // Act & Assert
             await Assert.ThrowsAsync<ArgumentException>(() =>
@@ -58,9 +58,9 @@ namespace TickiTackToe.Tests
             luckyMock.Setup(s => s.IsLucky(100)).Returns(false);
 
             var handler = new MakeMoveCommandHandler(repoMock.Object, luckyMock.Object);
-            var command1 = new MakeMoveCommand(game.Id, "X", 1, 1); // X
-            var command2 = new MakeMoveCommand(game.Id, "O", 1, 2); // O
-            var command3 = new MakeMoveCommand(game.Id, "X", 1, 3); // X
+            var command1 = new MakeMoveCommand(game.Id, "X", 0, 0); // X
+            var command2 = new MakeMoveCommand(game.Id, "O", 0, 1); // O
+            var command3 = new MakeMoveCommand(game.Id, "X", 0, 2); // X
 
             // Act
             await handler.Handle(command1, CancellationToken.None);
