@@ -36,12 +36,12 @@ namespace TickiTackToe.Domain.Entities
                 throw new InvalidOperationException("Game is finish");
             if (row >= GameSize || column >= GameSize || row < 0 || column < 0)
                 throw new ArgumentOutOfRangeException("Move is out of range field");
-            if (field[row, column] != CellState.Empty)
+            if (field[row][column] != CellState.Empty)
                 throw new InvalidOperationException("Cell is set");
 
             var playerToSet = GetPlayerForCurrentMove(isLucky);
 
-            field[row, column] = playerToSet;
+            field[row][column] = playerToSet;
 
             UpdateGame(field, playerToSet, row, column);
 
@@ -56,25 +56,27 @@ namespace TickiTackToe.Domain.Entities
 
         private string InitialField(int gameSize)
         {
-            CellState[,] field = new CellState[gameSize, gameSize];
-            for (int i = 0; i < GameSize; i++)
+            var field = new CellState[gameSize][];
+            for (int i = 0; i < gameSize; i++)
             {
-                for (int j = 0; j < GameSize; j++)
+                field[i] = new CellState[gameSize];
+                for (int j = 0; j < gameSize; j++)
                 {
-                    field[i, j] = CellState.Empty;
+                    field[i][j] = CellState.Empty;
                 }
             }
 
             return JsonSerializer.Serialize(field);
         }
 
-        private void SetField(CellState[,] field)
+        public CellState[][]? GetField()
+        {
+            return JsonSerializer.Deserialize<CellState[][]>(Field);
+        }
+
+        private void SetField(CellState[][] field)
         {
             Field = JsonSerializer.Serialize(field);
-        }
-        public CellState[,]? GetField()
-        {
-            return JsonSerializer.Deserialize<CellState[,]>(Field);
         }
 
         private CellState GetPlayerForCurrentMove(Func<int, bool> isLucky)
@@ -91,7 +93,7 @@ namespace TickiTackToe.Domain.Entities
             CurrentPlayer = (CurrentPlayer == CellState.X) ? CellState.O : CellState.X;
         }
 
-        private void UpdateGame(CellState[,] field, CellState player, int lastRow, int lastCol)
+        private void UpdateGame(CellState[][] field, CellState player, int lastRow, int lastCol)
         {
             if (CountInDirection(field, player, lastRow, lastCol, 0, 1) >= WinCondition || // горизонталь →
                 CountInDirection(field, player, lastRow, lastCol, 1, 0) >= WinCondition || // вертикаль ↓
@@ -108,13 +110,13 @@ namespace TickiTackToe.Domain.Entities
             }
         }
 
-        private int CountInDirection(CellState[,] field, CellState player, int row, int col, int rowDir, int colDir)
+        private int CountInDirection(CellState[][] field, CellState player, int row, int col, int rowDir, int colDir)
         {
             int count = 1;
 
             int r = row + rowDir;
             int c = col + colDir;
-            while (IsInsideField(r, c) && field[r, c] == player)
+            while (IsInsideField(r, c) && field[r][c] == player)
             {
                 count++;
                 r += rowDir;
@@ -123,7 +125,7 @@ namespace TickiTackToe.Domain.Entities
 
             r = row - rowDir;
             c = col - colDir;
-            while (IsInsideField(r, c) && field[r, c] == player)
+            while (IsInsideField(r, c) && field[r][c] == player)
             {
                 count++;
                 r -= rowDir;

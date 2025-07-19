@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using TickiTackToe.Application.Commands;
 using TickiTackToe.Application.Dtos;
+using TickiTackToe.Application.Queries;
 
 namespace TickiTackToe.Api.Controllers
 {
@@ -7,27 +10,58 @@ namespace TickiTackToe.Api.Controllers
     [Route("/api/games")]
     public class GamesController : ControllerBase
     {
-        public GamesController()
+        private readonly IMediator _mediator;
+
+        public GamesController(IMediator mediator)
         {
-            
+            _mediator = mediator;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateGame()
         {
-            throw new NotImplementedException();
+            var gameId = await _mediator.Send(new CreateGameCommand());
+            var response = await _mediator.Send(new GetGameQuery(gameId));
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetGame(Guid id)
         {
-            throw new NotImplementedException();
+            var response = await _mediator.Send(new GetGameQuery(id));
+
+            if(response is null) return NotFound();
+            return Ok(response);
         }
 
         [HttpPost("{id}/moves")]
         public async Task<IActionResult> MakeMove(Guid id, [FromBody] MoveRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _mediator.Send(new MakeMoveCommand(id, request.Player, request.Row, request.Column));
+            }
+            catch (NullReferenceException ex)
+            {
+                return NotFound(ex);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                return BadRequest(ex);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            var response = await _mediator.Send(new GetGameQuery(id));
+
+            if(response is null) return NotFound();
+            return Ok(response);
         }
     }
 }

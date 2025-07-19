@@ -27,6 +27,8 @@ namespace TickiTackToe.Application.Queries
             GameResponse response = new GameResponse 
             { 
                 Id = game.Id, 
+                GameSize = game.GameSize,
+                WinCondition = game.WinCondition,
                 CurrentPlayer = game.CurrentPlayer.ToString(), 
                 MoveNumber = game.MoveNumber, 
                 Status = game.Status.ToString(),
@@ -36,21 +38,22 @@ namespace TickiTackToe.Application.Queries
             return response;
         }
 
-        private string[,] GetArrField(Game game)
+        private string[][] GetArrField(Game game)
         {
             var field = game.GetField();
             if (field == null)
                 throw new ArgumentNullException(nameof(field));
 
-            int rows = field.GetLength(0);
-            int cols = field.GetLength(1);
-            string[,] result = new string[rows, cols];
+            int rows = field.Count();
+            int cols = field[0].Count();
+            string[][] result = new string[rows][];
 
             for (int i = 0; i < rows; i++)
             {
+                result[i] = new string[cols];
                 for (int j = 0; j < cols; j++)
                 {
-                    result[i, j] = field[i, j] switch
+                    result[i][j] = field[i][j] switch
                     {
                         CellState.X => "X",
                         CellState.O => "O",

@@ -1,0 +1,35 @@
+services:
+  api:
+    image: ticki-tack-api
+    build:
+      context: . 
+      dockerfile: TickiTackToe.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=ticktackdb;Username=postgres;Password=postgres;
+      - GameConfig__GameSize=3
+      - GameConfig__WinCondition=3
+    depends_on:
+      db:
+        condition: service_healthy 
+        
+  db:
+    image: postgres:latest 
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres 
+      - POSTGRES_DB=ticktackdb
+    ports:
+      - "5432" 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ticktackdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

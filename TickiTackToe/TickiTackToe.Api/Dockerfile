@@ -12,6 +12,9 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["TickiTackToe.Api/TickiTackToe.Api.csproj", "TickiTackToe.Api/"]
+COPY ["TickiTackToe.Application/TickiTackToe.Application.csproj", "TickiTackToe.Application/"]
+COPY ["TickiTackToe.Domain/TickiTackToe.Domain.csproj", "TickiTackToe.Domain/"]
+COPY ["TickiTackToe.Infrastructure/TickiTackToe.Infrastructure.csproj", "TickiTackToe.Infrastructure/"]
 RUN dotnet restore "./TickiTackToe.Api/TickiTackToe.Api.csproj"
 COPY . .
 WORKDIR "/src/TickiTackToe.Api"
