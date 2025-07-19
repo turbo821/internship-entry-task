@@ -46,10 +46,10 @@ jobs:
         done
 
     - name: Restore dependencies
-      run: dotnet restore TickiTackToe.Api/TickiTackToe.Api.csproj
+      run: dotnet restore TickiTackToe/TickiTackToe.Api/TickiTackToe.Api.csproj
 
     - name: Build
-      run: dotnet build TickiTackToe.Api/TickiTackToe.Api.csproj --no-restore
+      run: dotnet build TickiTackToe/TickiTackToe.Api/TickiTackToe.Api.csproj --no-restore
 
     - name: Run tests
-      run: dotnet test TickiTackToe.Tests/TickiTackToe.Tests.csproj --no-build --logger "trx"
+      run: dotnet test TickiTackToe/TickiTackToe.Tests/TickiTackToe.Tests.csproj --no-build --logger "trx"
