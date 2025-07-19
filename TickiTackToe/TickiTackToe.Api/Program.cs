@@ -6,7 +6,6 @@ using TickiTackToe.Api.Middlewares;
 using TickiTackToe.Application.Commands;
 using TickiTackToe.Application.Configurations;
 using TickiTackToe.Application.Interfaces;
-using TickiTackToe.Infrastructure.Cache;
 using TickiTackToe.Infrastructure.Data;
 using TickiTackToe.Infrastructure.Services;
 
