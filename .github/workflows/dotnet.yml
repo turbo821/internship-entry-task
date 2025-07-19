@@ -52,7 +52,4 @@ jobs:
       run: dotnet build TickiTackToe/TickiTackToe.Api/TickiTackToe.Api.csproj --no-restore
 
     - name: Run tests
-      run: dotnet test TickiTackToe/TickiTackToe.Tests/TickiTackToe.Tests.csproj --no-build --logger "trx"
-
-    - name: Run tests
-      run: dotnet test --no-build --logger "trx"
+      run: dotnet test TickiTackToe/TickiTackToe.sln --no-build --logger "trx"
