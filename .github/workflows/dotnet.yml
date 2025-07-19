@@ -53,3 +53,6 @@ jobs:
 
     - name: Run tests
       run: dotnet test TickiTackToe/TickiTackToe.Tests/TickiTackToe.Tests.csproj --no-build --logger "trx"
+
+    - name: Run tests
+      run: dotnet test --no-build --logger "trx"
