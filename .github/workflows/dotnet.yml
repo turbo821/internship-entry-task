@@ -1,0 +1,55 @@
+name: Build and Test .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=testdb;Username=postgres;Password=postgres
+      GameConfig__GameSize: 3
+      GameConfig__WinCondition: 3
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Wait for Postgres
+      run: |
+        until pg_isready -h localhost -p 5432 -U postgres; do
+          echo "Waiting for postgres...";
+          sleep 2;
+        done
+
+    - name: Restore dependencies
+      run: dotnet restore TickiTackToe.Api/TickiTackToe.Api.csproj
+
+    - name: Build
+      run: dotnet build TickiTackToe.Api/TickiTackToe.Api.csproj --no-restore
+
+    - name: Run tests
+      run: dotnet test TickiTackToe.Tests/TickiTackToe.Tests.csproj --no-build --logger "trx"
